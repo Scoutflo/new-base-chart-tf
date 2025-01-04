@@ -49,7 +49,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     ami_type    = "AL2_x86_64"
-    name_prefix = "mycluster-nodegroup-"
+    name_prefix = "scoutflo_nodegroup"
   }
 
   eks_managed_node_groups = {
