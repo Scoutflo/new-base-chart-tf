@@ -47,9 +47,9 @@ module "eks" {
   subnet_ids                     = module.vpc.public_subnets
   cluster_endpoint_public_access = true
 
-  eks_managed_node_group_defaults = {
-    ami_type    = "AL2_x86_64"
-    name_prefix = "scoutflo_nodegroup"
+  eks_managed_node_group_defaults = { 
+    ami_type   = "AL2_x86_64"
+    name_prefix = "eks-nodegroup-"
   }
 
   eks_managed_node_groups = {
