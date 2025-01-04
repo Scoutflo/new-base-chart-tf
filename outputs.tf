@@ -21,29 +21,14 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 
-output "vpc_name" {
-  description = "AWS VPC Name"
-  value       = module.vpc.name
-}
-
 output "k8s_version" {
   description = "Kubernetes version"
   value       = module.eks.cluster_version
 }
 
-output "cidr_range" {
-  description = "CIDR Range"
-  value       = module.vpc.vpc_cidr_block
-}
-
 output "aws_account_id" {
   description = "AWS Account ID"
   value       = data.aws_caller_identity.current.account_id
-}
-
-output "subnet_ids" {
-  description = "Subnet IDs"
-  value       = module.vpc.private_subnets
 }
 
 output "cluster_ingress_endpoint" {
