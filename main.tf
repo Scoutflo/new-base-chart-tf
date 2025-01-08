@@ -29,6 +29,16 @@ module "vpc" {
 
   enable_dns_hostnames = true
 
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = 1
+  }
+
+
+  tags = {
+    "scoutflo-terraform" = "true"
+  }
+
 }
 
 module "eks" {
@@ -58,6 +68,9 @@ module "eks" {
       desired_size = 5
     }
   }
+ tags = {
+    "scoutflo-terraform" = "true"
+  }
 }
 
 
@@ -74,6 +87,11 @@ module "irsa-ebs-csi" {
   provider_url                  = module.eks.oidc_provider
   role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+
+  tags = {
+    "scoutflo-terraform" = "true"
+  }
+
 }
 
 resource "aws_eks_addon" "ebs-csi" {
@@ -85,6 +103,7 @@ resource "aws_eks_addon" "ebs-csi" {
   tags = {
     "eks_addon" = "ebs-csi"
     "terraform" = "true"
+    "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
 }
@@ -96,6 +115,7 @@ resource "aws_eks_addon" "kube-proxy" {
   tags = {
     "eks_addon" = "kube-proxy"
     "terraform" = "true"
+    "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
 }
@@ -107,6 +127,7 @@ resource "aws_eks_addon" "vpc-cni" {
   tags = {
     "eks_addon" = "vpc-cni"
     "terraform" = "true"
+    "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
 }
@@ -118,6 +139,7 @@ resource "aws_eks_addon" "coredns" {
   tags = {
     "eks_addon" = "coredns"
     "terraform" = "true"
+    "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
 }
