@@ -41,6 +41,27 @@ output "cluster_egress_endpoint" {
   value       = try(module.eks.cluster_endpoint)
 }
 
+output "vpc_id" {
+  description = "VPC ID for the EKS cluster"
+  value       = module.vpc.vpc_id
+}
+
+output "subnet_ids" {
+  description = "Subnet IDs used for the EKS cluster"
+  value       = module.vpc.public_subnets
+}
+
+output "cidr_block" {
+  description = "CIDR block of the VPC"
+  value       = module.vpc.cidr_block
+}
+
+output "eks_node_groups" {
+  description = "Details of EKS managed node groups"
+  value       = module.eks.eks_managed_node_groups
+}
+
+
 /*
 output "nginx_ingress_controller_ip" {
   value       = length(helm_release.nginx_ingress.status) > 0 && length(helm_release.nginx_ingress.status[0].load_balancer) > 0 ? helm_release.nginx_ingress.status[0].load_balancer[0].ingress[0].ip : "Not Available"
