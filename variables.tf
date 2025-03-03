@@ -10,7 +10,7 @@ variable "region" {
 variable "cluster_name" {
   description = "Cluster name"
   type = string
-  default = "EKSNew"
+  default = "EKSNew2"
 }
 
 variable "instance_type" {
