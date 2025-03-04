@@ -130,19 +130,15 @@ resource "aws_eks_addon" "coredns" {
   depends_on = [module.eks]
 }
 
-resource "kubernetes_storage_class" "default_ebs" {
-  metadata {
-    name = "gp3-csi"
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" = "true"
-    }
-  }
+module "storage_class" {
+  source = "./modules/kubernetes-storage-class"
 
-  storage_provisioner = "ebs.csi.aws.com" # Correct argument name
-  volume_binding_mode = "WaitForFirstConsumer"
-  reclaim_policy      = "Delete"
-
-  parameters = {
+  name                 = "gp3-csi"
+  is_default           = true
+  provisioner          = "ebs.csi.aws.com"
+  volume_binding_mode  = "WaitForFirstConsumer"
+  reclaim_policy       = "Delete"
+  parameters           = {
     type   = "gp3"
     fsType = "ext4"
   }
