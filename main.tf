@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "var.region"
+  region = "your_region"
 }
 
 data "aws_availability_zones" "available" {
@@ -50,8 +50,8 @@ module "eks" {
       name           = "node-group-1"
       instance_types = ["t3.medium"]
       min_size       = 1
-      max_size       = 2
-      desired_size   = 5
+      max_size       = 5
+      desired_size   = 3
       capacity_type  = "ON_DEMAND"
     }
   }
@@ -130,26 +130,20 @@ resource "aws_eks_addon" "coredns" {
   depends_on = [module.eks]
 }
 
-# --- Kubernetes Provider Configuration ---
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-}
-
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.eks.token
 }
 
-# --- Pass Kubernetes Provider to Storage Class Module ---
+data "aws_eks_cluster_auth" "eks" {
+  name = module.eks.cluster_name
+}
+
 module "storage_class" {
   source = "./modules/kubernetes-storage-class"
+  depends_on = [module.eks]
   providers = {
     kubernetes = kubernetes
   }
-  depends_on = [module.eks]
 }
