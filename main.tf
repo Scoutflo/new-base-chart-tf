@@ -131,7 +131,7 @@ resource "aws_eks_addon" "coredns" {
 }
 
 resource "kubernetes_storage_class" "default_ebs" {
-  metadata {
+  metadata = {
     name = "gp3-csi"
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
