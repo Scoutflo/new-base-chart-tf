@@ -19,9 +19,9 @@ resource "random_string" "suffix" {
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
-  name = "scoutflo-vpc-${random_string.suffix.result}"
-  cidr = "10.0.0.0/16"
-  azs  = slice(data.aws_availability_zones.available.names, 0, 3)
+  name    = "scoutflo-vpc-${random_string.suffix.result}"
+  cidr    = "10.0.0.0/16"
+  azs     = slice(data.aws_availability_zones.available.names, 0, 3)
   public_subnets = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
   enable_dns_hostnames = true
   public_subnet_tags = {
@@ -34,12 +34,12 @@ module "vpc" {
 }
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "19.5.1"
+  source          = "terraform-aws-modules/eks/aws"
+  version         = "19.5.1"
   cluster_name    = "mycluster"
   cluster_version = "1.32"
-  vpc_id                         = module.vpc.vpc_id
-  subnet_ids                     = module.vpc.public_subnets
+  vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.public_subnets
   cluster_endpoint_public_access = true
   eks_managed_node_group_defaults = { 
     ami_type   = "AL2_x86_64"
@@ -47,12 +47,12 @@ module "eks" {
   }
   eks_managed_node_groups = {
     one = {
-      name = "node-group-1"
+      name           = "node-group-1"
       instance_types = ["t3.medium"]
-      min_size     = 1
-      max_size     = 2
-      desired_size = 5
-      capacity_type = "ON_DEMAND"
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 5
+      capacity_type  = "ON_DEMAND"
     }
   }
   tags = {
@@ -84,8 +84,8 @@ resource "aws_eks_addon" "ebs-csi" {
   resolve_conflicts        = "OVERWRITE"
   service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
   tags = {
-    "eks_addon" = "ebs-csi"
-    "terraform" = "true"
+    "eks_addon"         = "ebs-csi"
+    "terraform"         = "true"
     "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
@@ -97,8 +97,8 @@ resource "aws_eks_addon" "kube-proxy" {
   addon_version     = "v1.31.3-eksbuild.2"
   resolve_conflicts = "OVERWRITE"
   tags = {
-    "eks_addon" = "kube-proxy"
-    "terraform" = "true"
+    "eks_addon"         = "kube-proxy"
+    "terraform"         = "true"
     "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
@@ -110,8 +110,8 @@ resource "aws_eks_addon" "vpc-cni" {
   addon_version     = "v1.19.2-eksbuild.1"
   resolve_conflicts = "OVERWRITE"
   tags = {
-    "eks_addon" = "vpc-cni"
-    "terraform" = "true"
+    "eks_addon"         = "vpc-cni"
+    "terraform"         = "true"
     "scoutflo-terraform" = "true"
   }
   depends_on = [module.eks]
@@ -123,9 +123,26 @@ resource "aws_eks_addon" "coredns" {
   addon_version     = "v1.11.4-eksbuild.2"
   resolve_conflicts = "OVERWRITE"
   tags = {
-    "eks_addon" = "coredns"
-    "terraform" = "true"
+    "eks_addon"         = "coredns"
+    "terraform"         = "true"
     "scoutflo-terraform" = "true"
+  }
+  depends_on = [module.eks]
+}
+
+resource "kubernetes_storage_class" "default_ebs" {
+  metadata {
+    name = "gp3-csi"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+  }
+  provisioner         = "ebs.csi.aws.com"
+  volume_binding_mode = "WaitForFirstConsumer"
+  reclaim_policy      = "Delete"
+  parameters = {
+    type   = "gp3"
+    fsType = "ext4"
   }
   depends_on = [module.eks]
 }
