@@ -138,7 +138,7 @@ resource "kubernetes_storage_class" "default_ebs" {
     }
   }
 
-  storage_provisioner = "ebs.csi.aws.com" # Correct argument name
+  storage_provisioner = "ebs.csi.aws.com"
   volume_binding_mode = "WaitForFirstConsumer"
   reclaim_policy      = "Delete"
 
