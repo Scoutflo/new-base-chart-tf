@@ -132,16 +132,5 @@ resource "aws_eks_addon" "coredns" {
 
 module "storage_class" {
   source = "./modules/kubernetes-storage-class"
-
-  name                 = "gp3-csi"
-  is_default           = true
-  provisioner          = "ebs.csi.aws.com"
-  volume_binding_mode  = "WaitForFirstConsumer"
-  reclaim_policy       = "Delete"
-  parameters           = {
-    type   = "gp3"
-    fsType = "ext4"
-  }
-
   depends_on = [module.eks]
 }
