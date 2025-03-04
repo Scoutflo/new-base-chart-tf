@@ -16,5 +16,4 @@ resource "kubernetes_storage_class" "this" {
     fsType = "ext4"
   }
 
-  depends_on = [module.eks]
 }
