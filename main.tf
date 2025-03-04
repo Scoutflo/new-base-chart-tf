@@ -137,12 +137,15 @@ resource "kubernetes_storage_class" "default_ebs" {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
   }
+
   storage_provisioner  = "ebs.csi.aws.com"
   volume_binding_mode  = "WaitForFirstConsumer"
   reclaim_policy       = "Delete"
+
   parameters = {
     type   = "gp3"
     fsType = "ext4"
   }
+
   depends_on = [module.eks]
 }
